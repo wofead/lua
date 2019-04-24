@@ -11,8 +11,8 @@ local totalResult = 0
 local t1 = os.clock()
 --检查(n, c) 会不会被攻击
 ---@param table table
----@param n number
----@param c number
+---@param n number @表示行
+---@param c number @表示列
 ---@return boolean
 ---
 local function checkAttack(table, n, c)
@@ -58,8 +58,23 @@ local function addQueen(table, n)
 end
 
 addQueen({}, 1)
-print("Total answer:" .. totalResult)
+print("Total answer1:" .. totalResult)
 print("Method1 time:", os.clock() - t1)
+
+totalResult = 0
+t1 = os.clock()
+---@param t table|number
+local function deepCopy(t)
+    local result = {}
+    if type(t) == "number" then
+        table.insert(t, 1, t)
+    else
+        for i, v in ipairs(t) do
+            result[i] = t[i]
+        end
+    end
+    return result
+end
 
 ---@param table table
 ---@param n number
@@ -67,7 +82,7 @@ print("Method1 time:", os.clock() - t1)
 local function insertNumber(t, n)
     local result = {}
     for i = 1, #t + 1 do
-        result[i] = t
+        result[i] = deepCopy(t)
         table.insert(result[i], i, n)
     end
     return result
@@ -77,8 +92,9 @@ end
 ---@param t2 table
 ---@return table
 local function mergeTable(t1, t2)
+    local length = #t1
     for i = 1, #t2 do
-        table.insert(t1, #t1 + i, t2[i])
+        table.insert(t1, length + i, t2[i])
     end
 end
 
@@ -86,15 +102,39 @@ end
 ---@param n number
 ---@return table
 local function arrangement(t, n)
-    if n > N then
-        return t
-    end
     local temp = {}
-    for i = 1, #t + 1 do
-        temp = mergeTable(temp, insertNumber(t[i], n))
+    for i = 1, #t do
+        local tt = insertNumber(t[i], n)
+        mergeTable(temp, tt)
     end
-    arrangement(temp, n + 1)
+    return temp
 end
+
+local function getArrangement()
+    local table = { { 1, 2 }, { 2, 1 } }
+    for i = 3, N do
+        table = arrangement(table, i)
+    end
+    return table
+end
+local tr = getArrangement()
+print("Method2 time1:", os.clock() - t1)
+for i, v in ipairs(tr) do
+    local flag = true
+    for j, k in ipairs(v) do
+        if not checkAttack(v, j, k) then
+            flag = false
+            break
+        end
+    end
+    if flag then
+        printTable(v)
+    end
+end
+print("Total number:", #tr)
+print("Total answer2:" .. totalResult)
+print("Method2 time2:", os.clock() - t1)
+
 
 
 
