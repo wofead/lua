@@ -4,7 +4,7 @@
 --- DateTime: 2018/12/24 23:33
 ---
 
-require("chapter2.eightQueen")
+require("chapter5.tablePractice")
 
 
 
